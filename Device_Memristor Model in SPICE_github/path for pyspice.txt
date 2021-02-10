@@ -1,0 +1,3 @@
+the path where we stored the .lib file of custom memristor for Pyspcie
+
+C:\Users\duxingyu8\ngspice\PySpice\examples\libraries

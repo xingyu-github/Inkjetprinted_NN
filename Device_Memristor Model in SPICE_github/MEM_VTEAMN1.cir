@@ -1,0 +1,34 @@
+* VTEAM Memristor SPICE Model Using Biolek Window
+
+ * Connections:
+* TE:  Top electrode
+* BE:  Bottom electrode
+* XSV: External connection to plot state variable
+*      that is not used otherwise
+
+.SUBCKT MEM_VTEAMN1 TE BE XSV
+
+* Ron: Minimum device resistance
+* Roff: Maximum device resistance
+* p:   Parameter for window function
+* x0: State variable initial value
+
+.params Ron=314 Roff=3200 x0=0 p=2 Kon=2.9513e-9 aON=1.2577 Koff=-0.0011e-5 aOFF=0.1759 Von=0.02 Voff=-0.01 lambda=2.321513 Xon=1e-7
+
+ * Joglekar Window Function .func f(V1) = 1-pow((2*V1-1),(2*p))
+ * Biolek Window Function
+.func f(V1,I1)={1-pow((1-V1/Xon-stp(I1)),(2*p))}
+
+ * Memristor I-V Relationship
+.func IVRel(V1,V2) = V1/(Ron*exp(lambda*(V2-Xon)/(0-Xon)))
+
+ * Equation for state variable
+Gx 0 XSV value={IF(V(TE,BE)<=Von,IF(V(TE,BE)<=Voff, koff*(pow((V(TE,BE)/Voff-1),aOFF))*f(V(XSV,0),V(TE,BE)),0),kon*(pow((V(TE,BE)/Von-1),aON)))*f(V(XSV,0),V(TE,BE))}
+Cx XSV 0 {1}
+.ic V(XSV) = x0
+
+ * Current source representing memristor
+Gmem TE BE value={IVRel(V(TE,BE),V(XSV,0))}
+
+
+ .ENDS MEM_VTEAMN1
